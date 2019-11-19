@@ -1,4 +1,4 @@
-# Error
+# Error [![CircleCI](https://circleci.com/gh/well-ironed/error.svg?style=svg)](https://circleci.com/gh/well-ironed/error)
 
 Errors modeled as data.
 
