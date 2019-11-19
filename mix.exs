@@ -5,9 +5,11 @@ defmodule Error.MixProject do
     [
       app: :error,
       deps: deps(),
+      description: description(),
       docs: docs(),
       elixir: "~> 1.9",
       package: package(),
+      source_url: "https://github.com/well-ironed/error",
       start_permanent: Mix.env() == :prod,
       version: "0.1.0"
     ]
@@ -24,6 +26,10 @@ defmodule Error.MixProject do
       {:dialyxir, "~> 0.5.1", runtime: false},
       {:ex_doc, "~> 0.21.2", only: :dev, runtime: false}
     ]
+  end
+
+  defp description do
+    "Modeling errors as data"
   end
 
   defp docs do
