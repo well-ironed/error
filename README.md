@@ -17,9 +17,9 @@ end
 
 Errors come in two kinds:
 
-1. `:domain` errors which are part of your business model, or *Domain* in DDD
-   parlance. You can use the map in the second argument position to supply any
-   extra details you like:
+1. `:domain` errors, which are part of your business model, or *Domain* in DDD
+   parlance. You can use the map in the second argument position to supply
+   whatever extra details you find useful:
 
 ```
     Error.domain(:invalid_username, %{
@@ -28,8 +28,8 @@ Errors come in two kinds:
     })
 ```
 
-2. `:infra` errors which represent failures of the infrastructure or
-   computation substate. Similarly, you can supply a map ask the second
+2. `:infra` errors, which represent failures of the infrastructure or
+   computation substrate. Similarly, you can supply a map as the second
    argument, with arbitrary details of your choosing.
 
 ```
@@ -48,5 +48,3 @@ that you can investigate the issue later.
 
 Errors provide a convenient `to_map` function, so that your view logic doesn't
 need to know about the `Error` type.
-
-
