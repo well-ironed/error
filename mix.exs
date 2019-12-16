@@ -11,7 +11,7 @@ defmodule Error.MixProject do
       package: package(),
       source_url: "https://github.com/well-ironed/error",
       start_permanent: Mix.env() == :prod,
-      version: "0.1.1"
+      version: "0.2.0"
     ]
   end
 
