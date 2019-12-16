@@ -28,6 +28,7 @@ Errors come in two kinds:
     })
 ```
 
+
 2. `:infra` errors, which represent failures of the infrastructure or
    computation substrate. Similarly, you can supply a map as the second
    argument, with arbitrary details of your choosing.

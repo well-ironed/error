@@ -4,32 +4,28 @@ defmodule ErrorTest do
   alias Error
 
   test "a domain error can be created with reason" do
-    assert Error.domain(:reason) == %Error{
-             kind: :domain,
+    assert Error.domain(:reason) == %Error.DomainError{
              reason: :reason,
              details: %{}
            }
   end
 
   test "a domain error can be created with reason and details" do
-    assert Error.domain(:reason, %{extra: :info}) == %Error{
-             kind: :domain,
+    assert Error.domain(:reason, %{extra: :info}) == %Error.DomainError{
              reason: :reason,
              details: %{extra: :info}
            }
   end
 
   test "an infra error can be created with reason" do
-    assert Error.infra(:db_down) == %Error{
-             kind: :infra,
+    assert Error.infra(:db_down) == %Error.InfraError{
              reason: :db_down,
              details: %{}
            }
   end
 
   test "an infra error can be created with reason and details" do
-    assert Error.infra(:db_down, %{retried_count: 5}) == %Error{
-             kind: :infra,
+    assert Error.infra(:db_down, %{retried_count: 5}) == %Error.InfraError{
              reason: :db_down,
              details: %{retried_count: 5}
            }
