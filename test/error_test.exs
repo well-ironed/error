@@ -14,21 +14,24 @@ defmodule ErrorTest do
   test "a domain error can be created with reason and details" do
     assert Error.domain(:reason, %{extra: :info}) == %Error.DomainError{
              reason: :reason,
-             details: %{extra: :info}
+             details: %{extra: :info},
+             caused_by: :nothing
            }
   end
 
   test "an infra error can be created with reason" do
     assert Error.infra(:db_down) == %Error.InfraError{
              reason: :db_down,
-             details: %{}
+             details: %{},
+             caused_by: :nothing
            }
   end
 
   test "an infra error can be created with reason and details" do
     assert Error.infra(:db_down, %{retried_count: 5}) == %Error.InfraError{
              reason: :db_down,
-             details: %{retried_count: 5}
+             details: %{retried_count: 5},
+             caused_by: :nothing
            }
   end
 

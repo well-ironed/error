@@ -7,12 +7,12 @@ defmodule Error do
 
   defmodule DomainError do
     @moduledoc false
-    defstruct [:reason, :details, caused_by: :nothing]
+    defstruct [:reason, :details, :caused_by]
   end
 
   defmodule InfraError do
     @moduledoc false
-    defstruct [:reason, :details, caused_by: :nothing]
+    defstruct [:reason, :details, :caused_by]
   end
 
   @type kind :: :domain | :infra
@@ -27,7 +27,7 @@ defmodule Error do
   """
   @spec domain(atom(), a) :: t(a) when a: map
   def domain(reason, details \\ %{}) when is_atom(reason) and is_map(details) do
-    %DomainError{reason: reason, details: details}
+    %DomainError{reason: reason, details: details, caused_by: :nothing}
   end
 
   @doc """
@@ -35,7 +35,7 @@ defmodule Error do
   """
   @spec infra(atom(), a) :: t(a) when a: map
   def infra(reason, details \\ %{}) when is_atom(reason) and is_map(details) do
-    %InfraError{reason: reason, details: details}
+    %InfraError{reason: reason, details: details, caused_by: :nothing}
   end
 
   @doc """
