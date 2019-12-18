@@ -11,7 +11,7 @@ defmodule Error.MixProject do
       package: package(),
       source_url: "https://github.com/well-ironed/error",
       start_permanent: Mix.env() == :prod,
-      version: "0.2.0"
+      version: "0.3.0"
     ]
   end
 
@@ -24,7 +24,8 @@ defmodule Error.MixProject do
   defp deps do
     [
       {:dialyxir, "~> 0.5.1", only: [:dev, :test], runtime: false},
-      {:ex_doc, "~> 0.21.2", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.21.2", only: :dev, runtime: false},
+      {:fe, "~> 0.1.2"}
     ]
   end
 

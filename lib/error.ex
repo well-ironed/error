@@ -3,14 +3,16 @@ defmodule Error do
   Model domain and infrastructure errors as regular data.
   """
 
+  alias FE.Maybe
+
   defmodule DomainError do
     @moduledoc false
-    defstruct [:reason, :details]
+    defstruct [:reason, :details, caused_by: :nothing]
   end
 
   defmodule InfraError do
     @moduledoc false
-    defstruct [:reason, :details]
+    defstruct [:reason, :details, caused_by: :nothing]
   end
 
   @type kind :: :domain | :infra
@@ -70,6 +72,27 @@ defmodule Error do
     %InfraError{error | details: f.(details)}
   end
 
+  @doc """
+  Wrap a higher-level error 'on top' of a lower-level error.
+
+  Think of this as a stack trace, but in domain-model terms.
+  """
+  @spec wrap(t(a), t(a)) :: t(a) when a: map
+  def wrap(inner, %DomainError{} = outer) do
+    %{outer | caused_by: Maybe.just(inner)}
+  end
+  def wrap(inner, %InfraError{} = outer) do
+    %{outer | caused_by: Maybe.just(inner)}
+  end
+
+  @doc """
+  Extract the cause of an error (of type `Error.t()`).
+
+  Think of this as inspecting deeper into the stack trace.
+  """
+  @spec caused_by(t(a)) :: Maybe.t(t(a)) when a: map
+  def caused_by(%DomainError{caused_by: c}), do: c
+  def caused_by(%InfraError{caused_by: c}), do: c
 
   @doc """
   Convert an `Error` to an Elixir map.

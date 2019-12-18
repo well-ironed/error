@@ -6,7 +6,8 @@ defmodule ErrorTest do
   test "a domain error can be created with reason" do
     assert Error.domain(:reason) == %Error.DomainError{
              reason: :reason,
-             details: %{}
+             details: %{},
+             caused_by: :nothing
            }
   end
 
@@ -31,6 +32,27 @@ defmodule ErrorTest do
            }
   end
 
+  test "a domain error can be wrapped on top of an error" do
+    inner = Error.infra(:inner)
+    assert Error.wrap(inner, Error.domain(:outer)) ==
+      %Error.DomainError{
+        caused_by: {:just, inner},
+        details: %{},
+        reason: :outer
+      }
+  end
+
+  test "an infra error can be wrapped on top of an error" do
+    inner = Error.infra(:inner)
+    assert Error.wrap(inner, Error.infra(:outer))
+      ==
+      %Error.InfraError{
+        caused_by: {:just, inner},
+        details: %{},
+        reason: :outer
+      }
+  end
+
   test "error kind can be accessed" do
     error = Error.domain(:r, %{})
     assert Error.kind(error) == :domain
@@ -39,6 +61,24 @@ defmodule ErrorTest do
   test "error reason can be accessed" do
     error = Error.domain(:a, %{c: :d})
     assert Error.reason(error) == :a
+  end
+
+  test "error cause can be accessed (domain cause)" do
+    inner = Error.domain(:too_many_widgets)
+    error = Error.wrap(inner, Error.domain(:user_limits_exceeded))
+    assert Error.caused_by(error) == {:just, inner}
+  end
+
+  test "error cause can be accessed (infra cause)" do
+    inner = Error.infra(:x_failure)
+    error = Error.wrap(inner, Error.domain(:user_limits_exceeded))
+    assert Error.caused_by(error) == {:just, inner}
+  end
+
+  test "error cause can be accessed from infra error" do
+    inner = Error.infra(:x_failure)
+    error = Error.wrap(inner, Error.infra(:general_failure))
+    assert Error.caused_by(error) == {:just, inner}
   end
 
   test "error details can be accessed when set explicitly" do
@@ -59,6 +99,10 @@ defmodule ErrorTest do
 
   test "it can be converted to map" do
     error = Error.infra(:x, %{y: :z, a: "b"})
-    assert Error.to_map(error) == %{kind: :infra, reason: :x, details: %{y: :z, a: "b"}}
+    assert Error.to_map(error) == %{
+      caused_by: :nothing,
+      kind: :infra,
+      reason: :x,
+      details: %{y: :z, a: "b"}}
   end
 end
