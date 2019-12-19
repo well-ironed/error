@@ -101,6 +101,13 @@ defmodule Error do
   Convert an `Error` to an Elixir map.
   """
   @spec to_map(t) :: map
-  def to_map(%DomainError{} = e), do: Map.from_struct(e) |> Map.put(:kind, :domain)
-  def to_map(%InfraError{} = e), do: Map.from_struct(e) |> Map.put(:kind, :infra)
+  def to_map(%DomainError{} = e), do: to_map_rec(e) |> Map.put(:kind, :domain)
+  def to_map(%InfraError{} = e), do: to_map_rec(e) |> Map.put(:kind, :infra)
+
+  defp to_map_rec(e) do
+    inner_as_map = Maybe.map(e.caused_by, &to_map/1)
+
+    Map.from_struct(e)
+    |> Map.put(:caused_by, inner_as_map)
+  end
 end

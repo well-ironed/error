@@ -111,4 +111,23 @@ defmodule ErrorTest do
              details: %{y: :z, a: "b"}
            }
   end
+
+  test "a wrapped error is recursively converted to a map" do
+    inner = Error.infra(:i, %{inner_details: "abc"})
+
+    outer =
+      Error.wrap(
+        inner,
+        Error.domain(:o, %{outer_details: "xyz"})
+      )
+
+    assert Error.to_map(outer) == %{
+             caused_by:
+               {:just,
+                %{caused_by: :nothing, kind: :infra, reason: :i, details: %{inner_details: "abc"}}},
+             kind: :domain,
+             reason: :o,
+             details: %{outer_details: "xyz"}
+           }
+  end
 end
