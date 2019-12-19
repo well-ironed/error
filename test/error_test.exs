@@ -37,23 +37,24 @@ defmodule ErrorTest do
 
   test "a domain error can be wrapped on top of an error" do
     inner = Error.infra(:inner)
+
     assert Error.wrap(inner, Error.domain(:outer)) ==
-      %Error.DomainError{
-        caused_by: {:just, inner},
-        details: %{},
-        reason: :outer
-      }
+             %Error.DomainError{
+               caused_by: {:just, inner},
+               details: %{},
+               reason: :outer
+             }
   end
 
   test "an infra error can be wrapped on top of an error" do
     inner = Error.infra(:inner)
-    assert Error.wrap(inner, Error.infra(:outer))
-      ==
-      %Error.InfraError{
-        caused_by: {:just, inner},
-        details: %{},
-        reason: :outer
-      }
+
+    assert Error.wrap(inner, Error.infra(:outer)) ==
+             %Error.InfraError{
+               caused_by: {:just, inner},
+               details: %{},
+               reason: :outer
+             }
   end
 
   test "error kind can be accessed" do
@@ -102,10 +103,12 @@ defmodule ErrorTest do
 
   test "it can be converted to map" do
     error = Error.infra(:x, %{y: :z, a: "b"})
+
     assert Error.to_map(error) == %{
-      caused_by: :nothing,
-      kind: :infra,
-      reason: :x,
-      details: %{y: :z, a: "b"}}
+             caused_by: :nothing,
+             kind: :infra,
+             reason: :x,
+             details: %{y: :z, a: "b"}
+           }
   end
 end

@@ -17,8 +17,9 @@ defmodule Error do
 
   @type kind :: :domain | :infra
   @type reason :: atom()
-  @opaque t(a) :: %DomainError{reason: reason, details: a}
-                | %InfraError{reason: reason, details: a}
+  @opaque t(a) ::
+            %DomainError{reason: reason, details: a}
+            | %InfraError{reason: reason, details: a}
 
   @opaque t :: t(map())
 
@@ -68,6 +69,7 @@ defmodule Error do
   def map_details(%DomainError{details: details} = error, f) do
     %DomainError{error | details: f.(details)}
   end
+
   def map_details(%InfraError{details: details} = error, f) do
     %InfraError{error | details: f.(details)}
   end
@@ -81,6 +83,7 @@ defmodule Error do
   def wrap(inner, %DomainError{} = outer) do
     %{outer | caused_by: Maybe.just(inner)}
   end
+
   def wrap(inner, %InfraError{} = outer) do
     %{outer | caused_by: Maybe.just(inner)}
   end
@@ -99,5 +102,5 @@ defmodule Error do
   """
   @spec to_map(t) :: map
   def to_map(%DomainError{} = e), do: Map.from_struct(e) |> Map.put(:kind, :domain)
-  def to_map(%InfraError{} = e), do: Map.from_struct(e)|> Map.put(:kind, :infra)
+  def to_map(%InfraError{} = e), do: Map.from_struct(e) |> Map.put(:kind, :infra)
 end
