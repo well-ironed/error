@@ -23,6 +23,12 @@ defmodule Error do
 
   @opaque t :: t(map())
 
+  @opaque domain(a) :: %DomainError{reason: reason, details: a}
+  @opaque domain() :: domain(map())
+
+  @opaque infra(a) :: %InfraError{reason: reason, details: a}
+  @opaque infra() :: infra(map())
+
   @doc """
   Create a `domain` error, with a reason and optional details.
   """
