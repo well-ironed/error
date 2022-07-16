@@ -7,11 +7,11 @@ defmodule Error.MixProject do
       deps: deps(),
       description: description(),
       docs: docs(),
-      elixir: "~> 1.9",
+      elixir: "~> 1.11",
       package: package(),
       source_url: "https://github.com/well-ironed/error",
       start_permanent: Mix.env() == :prod,
-      version: "0.3.5"
+      version: "0.4.0"
     ]
   end
 

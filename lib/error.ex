@@ -30,6 +30,24 @@ defmodule Error do
   @opaque infra() :: infra(map())
 
   @doc """
+  A guard to use in order to pattern match errors.
+  Will match on Infra errors, but not Domain errors.
+  """
+  defguard is_infra_error(x) when is_struct(x, InfraError)
+
+  @doc """
+  A guard to use in order to pattern match errors.
+  Will match on Domain errors, but not Infra errors.
+  """
+  defguard is_domain_error(x) when is_struct(x, DomainError)
+
+  @doc """
+  A guard to use in order to pattern match errors.
+  Will match on both Infra and Domain Errors.
+  """
+  defguard is_error(x) when is_infra_error(x) or is_domain_error(x)
+
+  @doc """
   Create a `domain` error, with a reason and optional details.
   """
   @spec domain(atom(), a) :: t(a) when a: map

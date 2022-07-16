@@ -130,4 +130,40 @@ defmodule ErrorTest do
              details: %{outer_details: "xyz"}
            }
   end
+
+  test "is_error is available as a guard for access in pattern matches" do
+    import Error, only: [is_error: 1]
+
+    m =
+      case Error.infra(:my_reason, %{y: :z, a: "b"}) do
+        f when is_integer(f) -> :no_reason
+        e when is_error(e) -> Error.reason(e)
+      end
+
+    assert m == :my_reason
+  end
+
+  test "is_infra_error is available as a guard for access in pattern matches" do
+    import Error, only: [is_infra_error: 1]
+
+    m =
+      case Error.domain(:my_reason, %{y: :z, a: "b"}) do
+        e when is_infra_error(e) -> Error.reason(e)
+        _other -> :not_matched
+      end
+
+    assert m == :not_matched
+  end
+
+  test "is_domain_error is available as a guard for access in pattern matches" do
+    import Error, only: [is_domain_error: 1]
+
+    m =
+      case Error.infra(:my_reason, %{y: :z, a: "b"}) do
+        e when is_domain_error(e) -> Error.reason(e)
+        _other -> :not_matched
+      end
+
+    assert m == :not_matched
+  end
 end
