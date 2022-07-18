@@ -122,11 +122,11 @@ defmodule Error do
   def caused_by(%InfraError{caused_by: c}), do: c
 
   @doc """
-  Flattens the given error and all its nested causes into list.
+  Flattens the given error and all its nested causes into a list.
 
-  Given error is always the first element of resulting list.
+  The given error is always the first element of resulting list.
   """
-  @spec flatten(t(a)) :: [t(a)] when a: map
+  @spec flatten(t(a)) :: [t(a)] when a: any
   def flatten(%DomainError{} = e), do: caused_by(e) |> flatten_rec([e])
   def flatten(%InfraError{} = e), do: caused_by(e) |> flatten_rec([e])
 
@@ -134,11 +134,11 @@ defmodule Error do
   defp flatten_rec({:just, e}, acc), do: caused_by(e) |> flatten_rec([e | acc])
 
   @doc """
-  Extracts the root cause of given error.
+  Extracts the root cause of the given error.
 
-  The root cause of error without cause is the error itself.
+  The root cause of an error without an underlying cause is the error itself.
   """
-  @spec root_cause(t(a)) :: t(a) when a: map
+  @spec root_cause(t(a)) :: t(a) when a: any
   def root_cause(e), do: flatten(e) |> List.last()
 
   @doc """
