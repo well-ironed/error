@@ -113,6 +113,16 @@ defmodule Error do
   end
 
   @doc """
+  Convenience to extract cause of error and unwrap it from `{:just, error}` tuple.
+  """
+  @spec unwrap(t(a)) :: t(a) | :nothing when a: map
+  def unwrap(%DomainError{} = e), do: caused_by(e) |> do_unwrap()
+  def unwrap(%InfraError{} = e), do: caused_by(e) |> do_unwrap()
+
+  defp do_unwrap({:just, c}), do: c
+  defp do_unwrap(c), do: c
+
+  @doc """
   Extract the cause of an error (of type `Error.t()`).
 
   Think of this as inspecting deeper into the stack trace.
@@ -120,6 +130,26 @@ defmodule Error do
   @spec caused_by(t(a)) :: Maybe.t(t(a)) when a: map
   def caused_by(%DomainError{caused_by: c}), do: c
   def caused_by(%InfraError{caused_by: c}), do: c
+
+  @doc """
+  Flattens the given error and all its nested causes into list.
+
+  Given error is always the first element of resulting list.
+  """
+  @spec flatten(t(a)) :: [t(a)] when a: map
+  def flatten(%DomainError{} = e), do: flatten_rec(e, [])
+  def flatten(%InfraError{} = e), do: flatten_rec(e, [])
+
+  defp flatten_rec(:nothing, acc), do: Enum.reverse(acc)
+  defp flatten_rec(e, acc), do: unwrap(e) |> flatten_rec([e | acc])
+
+  @doc """
+  Extracts the root cause of given error.
+
+  The root cause of error without cause is the error itself.
+  """
+  @spec root_cause(t(a)) :: t(a) when a: map
+  def root_cause(e), do: flatten(e) |> List.last()
 
   @doc """
   Convert an `Error` to an Elixir map.

@@ -57,6 +57,32 @@ defmodule ErrorTest do
              }
   end
 
+  test "a domain error can be unwrapped from previously wrapped error" do
+    inner = Error.domain(:inner)
+    wrapped_domain_error = Error.wrap(inner, Error.domain(:outer))
+    wrapped_infra_error = Error.wrap(inner, Error.domain(:outer))
+
+    assert Error.unwrap(wrapped_domain_error) == inner
+    assert Error.unwrap(wrapped_infra_error) == inner
+  end
+
+  test "an infra error can be unwrapped from previously wrapped error" do
+    inner = Error.infra(:inner)
+    wrapped_by_domain_error = Error.wrap(inner, Error.domain(:outer))
+    wrapped_infra_error = Error.wrap(inner, Error.domain(:outer))
+
+    assert Error.unwrap(wrapped_by_domain_error) == inner
+    assert Error.unwrap(wrapped_infra_error) == inner
+  end
+
+  test "unwrapping error without a cause should return :nothing" do
+    infra = Error.infra(:infra)
+    domain = Error.domain(:domain)
+
+    assert :nothing == Error.unwrap(infra)
+    assert :nothing == Error.unwrap(domain)
+  end
+
   test "error kind can be accessed" do
     error = Error.domain(:r, %{})
     assert Error.kind(error) == :domain
@@ -165,5 +191,41 @@ defmodule ErrorTest do
       end
 
     assert m == :not_matched
+  end
+
+  test "should flatten multiple nested errors" do
+    root_cause = Error.domain(:root)
+    layer_1 = Error.wrap(root_cause, Error.domain(:layer1))
+    layer_2 = Error.wrap(layer_1, Error.infra(:layer2))
+    layer_3 = Error.wrap(layer_2, Error.infra(:layer3))
+    layer_4 = Error.wrap(layer_3, Error.domain(:layer4))
+
+    assert [layer_4, layer_3, layer_2, layer_1, root_cause] == Error.flatten(layer_4)
+  end
+
+  test "flatten of non-nested error should just return it" do
+    infra = Error.infra(:infra)
+    domain = Error.domain(:domain)
+
+    assert [infra] == Error.flatten(infra)
+    assert [domain] == Error.flatten(domain)
+  end
+
+  test "should retrieve root cause of multiple nested errors" do
+    root_cause = Error.domain(:root)
+    layer_1 = Error.wrap(root_cause, Error.domain(:layer1))
+    layer_2 = Error.wrap(layer_1, Error.infra(:layer2))
+    layer_3 = Error.wrap(layer_2, Error.infra(:layer3))
+    layer_4 = Error.wrap(layer_3, Error.domain(:layer4))
+
+    assert root_cause == Error.root_cause(layer_4)
+  end
+
+  test "root cause of non-nested error is the error itself" do
+    infra = Error.infra(:infra)
+    domain = Error.domain(:domain)
+
+    assert infra == Error.root_cause(infra)
+    assert domain == Error.root_cause(domain)
   end
 end
