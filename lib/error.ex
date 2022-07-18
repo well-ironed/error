@@ -122,6 +122,26 @@ defmodule Error do
   def caused_by(%InfraError{caused_by: c}), do: c
 
   @doc """
+  Flattens the given error and all its nested causes into a list.
+
+  The given error is always the first element of resulting list.
+  """
+  @spec flatten(t(a)) :: [t(a)] when a: any
+  def flatten(%DomainError{} = e), do: caused_by(e) |> flatten_rec([e])
+  def flatten(%InfraError{} = e), do: caused_by(e) |> flatten_rec([e])
+
+  defp flatten_rec(:nothing, acc), do: Enum.reverse(acc)
+  defp flatten_rec({:just, e}, acc), do: caused_by(e) |> flatten_rec([e | acc])
+
+  @doc """
+  Extracts the root cause of the given error.
+
+  The root cause of an error without an underlying cause is the error itself.
+  """
+  @spec root_cause(t(a)) :: t(a) when a: any
+  def root_cause(e), do: flatten(e) |> List.last()
+
+  @doc """
   Convert an `Error` to an Elixir map.
   """
   @spec to_map(t) :: map
