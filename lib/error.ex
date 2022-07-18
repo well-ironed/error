@@ -113,16 +113,6 @@ defmodule Error do
   end
 
   @doc """
-  Convenience to extract cause of error and unwrap it from `{:just, error}` tuple.
-  """
-  @spec unwrap(t(a)) :: t(a) | :nothing when a: map
-  def unwrap(%DomainError{} = e), do: caused_by(e) |> do_unwrap()
-  def unwrap(%InfraError{} = e), do: caused_by(e) |> do_unwrap()
-
-  defp do_unwrap({:just, c}), do: c
-  defp do_unwrap(c), do: c
-
-  @doc """
   Extract the cause of an error (of type `Error.t()`).
 
   Think of this as inspecting deeper into the stack trace.
@@ -137,11 +127,11 @@ defmodule Error do
   Given error is always the first element of resulting list.
   """
   @spec flatten(t(a)) :: [t(a)] when a: map
-  def flatten(%DomainError{} = e), do: flatten_rec(e, [])
-  def flatten(%InfraError{} = e), do: flatten_rec(e, [])
+  def flatten(%DomainError{} = e), do: caused_by(e) |> flatten_rec([e])
+  def flatten(%InfraError{} = e), do: caused_by(e) |> flatten_rec([e])
 
   defp flatten_rec(:nothing, acc), do: Enum.reverse(acc)
-  defp flatten_rec(e, acc), do: unwrap(e) |> flatten_rec([e | acc])
+  defp flatten_rec({:just, e}, acc), do: caused_by(e) |> flatten_rec([e | acc])
 
   @doc """
   Extracts the root cause of given error.

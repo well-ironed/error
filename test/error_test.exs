@@ -57,32 +57,6 @@ defmodule ErrorTest do
              }
   end
 
-  test "a domain error can be unwrapped from previously wrapped error" do
-    inner = Error.domain(:inner)
-    wrapped_domain_error = Error.wrap(inner, Error.domain(:outer))
-    wrapped_infra_error = Error.wrap(inner, Error.domain(:outer))
-
-    assert Error.unwrap(wrapped_domain_error) == inner
-    assert Error.unwrap(wrapped_infra_error) == inner
-  end
-
-  test "an infra error can be unwrapped from previously wrapped error" do
-    inner = Error.infra(:inner)
-    wrapped_by_domain_error = Error.wrap(inner, Error.domain(:outer))
-    wrapped_infra_error = Error.wrap(inner, Error.domain(:outer))
-
-    assert Error.unwrap(wrapped_by_domain_error) == inner
-    assert Error.unwrap(wrapped_infra_error) == inner
-  end
-
-  test "unwrapping error without a cause should return :nothing" do
-    infra = Error.infra(:infra)
-    domain = Error.domain(:domain)
-
-    assert :nothing == Error.unwrap(infra)
-    assert :nothing == Error.unwrap(domain)
-  end
-
   test "error kind can be accessed" do
     error = Error.domain(:r, %{})
     assert Error.kind(error) == :domain
