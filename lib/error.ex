@@ -17,17 +17,17 @@ defmodule Error do
 
   @type kind :: :domain | :infra
   @type reason :: atom()
-  @opaque t(a) ::
-            %DomainError{reason: reason, details: a}
-            | %InfraError{reason: reason, details: a}
+  @type t(a) ::
+          %DomainError{reason: reason, details: a}
+          | %InfraError{reason: reason, details: a}
 
-  @opaque t :: t(map())
+  @type t :: t(any())
 
-  @opaque domain(a) :: %DomainError{reason: reason, details: a}
-  @opaque domain() :: domain(map())
+  @type domain(a) :: %DomainError{reason: reason, details: a}
+  @type domain() :: domain(any())
 
-  @opaque infra(a) :: %InfraError{reason: reason, details: a}
-  @opaque infra() :: infra(map())
+  @type infra(a) :: %InfraError{reason: reason, details: a}
+  @type infra() :: infra(any())
 
   @doc """
   A guard to use in order to pattern match errors.
@@ -50,7 +50,7 @@ defmodule Error do
   @doc """
   Create a `domain` error, with a reason and optional details.
   """
-  @spec domain(atom(), a) :: t(a) when a: map
+  @spec domain(atom(), a) :: t(a) when a: any
   def domain(reason, details \\ %{}) when is_atom(reason) and is_map(details) do
     %DomainError{reason: reason, details: details, caused_by: :nothing}
   end
@@ -58,7 +58,7 @@ defmodule Error do
   @doc """
   Create an `infra` error, with a reason and optional details.
   """
-  @spec infra(atom(), a) :: t(a) when a: map
+  @spec infra(atom(), a) :: t(a) when a: any
   def infra(reason, details \\ %{}) when is_atom(reason) and is_map(details) do
     %InfraError{reason: reason, details: details, caused_by: :nothing}
   end
@@ -80,7 +80,7 @@ defmodule Error do
   @doc """
   Return the map of detailed information supplied at `Error` creation.
   """
-  @spec details(t(a)) :: a when a: map
+  @spec details(t(a)) :: a when a: any
   def details(%DomainError{details: details}), do: details
   def details(%InfraError{details: details}), do: details
 
@@ -89,7 +89,7 @@ defmodule Error do
 
   Useful for adding extra details, modifying exisint ones, or removing them.
   """
-  @spec map_details(t(a), (a -> b)) :: t(b) when a: map, b: map
+  @spec map_details(t(a), (a -> b)) :: t(b) when a: any, b: any
   def map_details(%DomainError{details: details} = error, f) do
     %DomainError{error | details: f.(details)}
   end
@@ -103,7 +103,7 @@ defmodule Error do
 
   Think of this as a stack trace, but in domain-model terms.
   """
-  @spec wrap(t(a), t(a)) :: t(a) when a: map
+  @spec wrap(t(a), t(a)) :: t(a) when a: any
   def wrap(inner, %DomainError{} = outer) do
     %{outer | caused_by: Maybe.just(inner)}
   end
@@ -117,7 +117,7 @@ defmodule Error do
 
   Think of this as inspecting deeper into the stack trace.
   """
-  @spec caused_by(t(a)) :: Maybe.t(t(a)) when a: map
+  @spec caused_by(t(a)) :: Maybe.t(t(a)) when a: any
   def caused_by(%DomainError{caused_by: c}), do: c
   def caused_by(%InfraError{caused_by: c}), do: c
 
