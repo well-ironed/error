@@ -52,23 +52,12 @@ need to know about the `Error` type.
 
 ## Pattern-matching
 
-If you'd like to pattern-match on errors, you will find that Dialyzer rejects
-your attempts, complaining that the Error.InfraError and Error.DomainError
-structs are opaque. The way to get around this without breaking opacity is by
-importing the guard `is_error`, or the specific guards `is_infra_error` and
-`is_domain_error`.
+If you'd like to pattern-match on errors, it's possible to match directly on the
+`Error.InfraError` and `Error.DomainError` structs, however it's **strongly  discouraged**.  
+The best way of testing for domain or infra errors are dedicated guards. Import the guard `is_error`,
+or the specific guards `is_infra_error` and `is_domain_error` and use them in the match clauses:
 
 ```
-
-# DIALYZER WILL REJECT THIS
-
-    case something() do
-        {:ok, %MyItem{} = i} -> handle(i)
-        {:error, %DomainError{} = e} -> Error.reason(e)
-        {:error, :some_atom} -> other_path()
-    end
-
-# DIALYZER WILL ACCEPT THIS
 
     import Error, only: [is_error: 1]
     case something() do
